@@ -1,5 +1,8 @@
-package org.ecommerce.customer.customer;
+package org.ecommerce.customer.customer.mapper;
 
+import org.ecommerce.customer.customer.dto.CustomerRequest;
+import org.ecommerce.customer.customer.dto.CustomerResponse;
+import org.ecommerce.customer.customer.entity.Customer;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,5 +19,13 @@ public class CustomerMapper {
                 .address(customerRequest.address())
                 .build();
 
+    }
+
+    public CustomerResponse fromCustomer(Customer customer) {
+        return new CustomerResponse(customer.getId(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getEmail(),
+                customer.getAddress());
     }
 }

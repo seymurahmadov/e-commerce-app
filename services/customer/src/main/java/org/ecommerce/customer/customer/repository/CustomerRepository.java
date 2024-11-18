@@ -1,5 +1,6 @@
-package org.ecommerce.customer.customer;
+package org.ecommerce.customer.customer.repository;
 
+import org.ecommerce.customer.customer.entity.Customer;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

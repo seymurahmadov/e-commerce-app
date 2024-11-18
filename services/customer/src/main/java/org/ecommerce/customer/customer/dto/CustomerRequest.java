@@ -1,7 +1,9 @@
-package org.ecommerce.customer.customer;
+package org.ecommerce.customer.customer.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import org.ecommerce.customer.customer.entity.Address;
+
 
 public record CustomerRequest(
         String id,
@@ -14,6 +16,7 @@ public record CustomerRequest(
         @NotNull(message = "Customer's email is required")
         @Email(message = "Customer's email is not a valid email address")
         String email,
+
         Address address
 ) {
 }
