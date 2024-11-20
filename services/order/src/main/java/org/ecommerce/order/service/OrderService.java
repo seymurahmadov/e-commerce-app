@@ -1,10 +1,14 @@
 package org.ecommerce.order.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ecommerce.order.customer.CustomerClient;
 import org.ecommerce.order.dto.OrderRequest;
+import org.ecommerce.order.dto.OrderResponse;
 import org.ecommerce.order.exception.BusinessException;
+import org.ecommerce.order.kafka.OrderCorfirmation;
+import org.ecommerce.order.kafka.OrderProducer;
 import org.ecommerce.order.mapper.OrderMapper;
 import org.ecommerce.order.orderLine.OrderLineRequest;
 import org.ecommerce.order.orderLine.OrderLineService;
@@ -30,12 +34,14 @@ public class  OrderService {
 
     private final OrderLineService orderLineService;
 
+    private final OrderProducer orderProducer;
+
     public Integer createOrder(@Valid OrderRequest request) throws BusinessException {
       var customer = customerClient.findCustomerById(request.customerId()).orElseThrow(() ->
               new BusinessException("Cannot create order:: No customer exist with the provided ID"));
 
 
-        List<PurchaseResponse> purchaseResponses = this.productClient.purchaseProducts(request.products());
+        List<PurchaseResponse> purchaseProducts = this.productClient.purchaseProducts(request.products());
 
         var order = this.orderRepository.save(mapper.toOrder(request));
 
@@ -50,6 +56,29 @@ public class  OrderService {
 
         }
 
-        return null;
+        orderProducer.sendOrderConfirmation(
+                new OrderCorfirmation(
+                        request.reference(),
+                        request.amount(),
+                        request.paymentMethod(),
+                        customer,
+                        purchaseProducts
+
+                )
+        );
+
+        return order.getId();
+    }
+
+    public List<OrderResponse> findAll() {
+        return orderRepository.findAll().stream()
+                .map(mapper::fromOrder)
+                .toList();
+    }
+
+    public OrderResponse findById(Integer id) {
+        return this.orderRepository.findById(id)
+                .map(this.mapper::fromOrder)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("No order found with the provided ID: %d", id)));
     }
 }

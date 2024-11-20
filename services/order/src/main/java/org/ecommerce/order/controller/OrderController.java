@@ -1,15 +1,16 @@
 package org.ecommerce.order.controller;
 
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.ecommerce.order.dto.OrderRequest;
+import org.ecommerce.order.dto.OrderResponse;
 import org.ecommerce.order.exception.BusinessException;
 import org.ecommerce.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -22,5 +23,16 @@ public class OrderController {
     public ResponseEntity<Integer> createOrder (@RequestBody @Valid OrderRequest request) throws BusinessException {
         return ResponseEntity.ok(orderService.createOrder(request));
 
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderResponse>> findAll(){
+        return ResponseEntity.ok(orderService.findAll());
+    }
+
+
+    @GetMapping("/{order-id}")
+    public ResponseEntity<OrderResponse> findAll(@PathVariable("order-id") Integer orderId){
+        return ResponseEntity.ok(orderService.findById(orderId));
     }
 }
