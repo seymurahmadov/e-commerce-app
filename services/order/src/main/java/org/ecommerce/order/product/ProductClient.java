@@ -14,10 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductClient {
 
-    @Value("${application.config.product-url}")
+    @Value("http://localhost:8222/api/v1/products")
     private String productUrl;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public List<PurchaseResponse> purchaseProducts(List<PurchaseRequest> requestBody) throws BusinessException {
         HttpHeaders headers = new HttpHeaders();
@@ -30,7 +30,7 @@ public class ProductClient {
                 };
 
         ResponseEntity<List<PurchaseResponse>> responseEntity = restTemplate.exchange(
-                productUrl + "/purchase",
+                productUrl+"/purchases",
                 HttpMethod.POST,
                 requestEntity,
                 responseType

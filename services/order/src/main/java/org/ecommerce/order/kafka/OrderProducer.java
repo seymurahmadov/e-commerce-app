@@ -17,9 +17,9 @@ public class OrderProducer {
 
 
 
-    public void sendOrderConfirmation(OrderCorfirmation orderCorfirmation){
+    public void sendOrderConfirmation(OrderConfirmation orderCorfirmation){
         log.info("Sending order confirmation");
-        Message<OrderCorfirmation> message = MessageBuilder
+        Message<OrderConfirmation> message = MessageBuilder
                 .withPayload(orderCorfirmation)
                 .setHeader(KafkaHeaders.TOPIC, "order-topic")
                 .build();

@@ -58,7 +58,7 @@ public class CustomerService {
     }
 
     public List<CustomerResponse> findAllCustomer() {
-        customerRepository.findAll().stream()
+        return customerRepository.findAll().stream()
                 .map(customerMapper::fromCustomer)
                 .toList();
 
@@ -69,8 +69,8 @@ public class CustomerService {
     }
 
     public CustomerResponse findById(String customerId) throws CustomerNotFoundException {
-       return customerRepository.findById(customerId).map(customerMapper::fromCustomer)
-                .orElseThrow(()-> new CustomerNotFoundException(format("no customer found the provided ID :: %s", customerId)));
+        return customerRepository.findById(customerId).map(customerMapper::fromCustomer)
+                .orElseThrow(() -> new CustomerNotFoundException(format("no customer found the provided ID :: %s", customerId)));
     }
 
     public void delete(String customerId) {

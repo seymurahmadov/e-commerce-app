@@ -7,11 +7,13 @@ import org.ecommerce.order.customer.CustomerClient;
 import org.ecommerce.order.dto.OrderRequest;
 import org.ecommerce.order.dto.OrderResponse;
 import org.ecommerce.order.exception.BusinessException;
-import org.ecommerce.order.kafka.OrderCorfirmation;
+import org.ecommerce.order.kafka.OrderConfirmation;
 import org.ecommerce.order.kafka.OrderProducer;
 import org.ecommerce.order.mapper.OrderMapper;
 import org.ecommerce.order.orderLine.OrderLineRequest;
 import org.ecommerce.order.orderLine.OrderLineService;
+import org.ecommerce.order.payment.PaymentClient;
+import org.ecommerce.order.payment.PaymentRequest;
 import org.ecommerce.order.product.ProductClient;
 import org.ecommerce.order.product.PurchaseRequest;
 import org.ecommerce.order.product.PurchaseResponse;
@@ -36,6 +38,8 @@ public class  OrderService {
 
     private final OrderProducer orderProducer;
 
+    private final PaymentClient paymentClient;
+
     public Integer createOrder(@Valid OrderRequest request) throws BusinessException {
       var customer = customerClient.findCustomerById(request.customerId()).orElseThrow(() ->
               new BusinessException("Cannot create order:: No customer exist with the provided ID"));
@@ -56,8 +60,18 @@ public class  OrderService {
 
         }
 
+        var paymentRequest = new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+        );
+
+        paymentClient.requestOrderPayment(paymentRequest);
+
         orderProducer.sendOrderConfirmation(
-                new OrderCorfirmation(
+                new OrderConfirmation(
                         request.reference(),
                         request.amount(),
                         request.paymentMethod(),
